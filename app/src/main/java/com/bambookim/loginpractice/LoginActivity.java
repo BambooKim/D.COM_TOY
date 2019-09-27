@@ -4,9 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,24 +29,29 @@ import java.net.URL;
 
 public class LoginActivity extends AppCompatActivity {
 
-    EditText et_id;
-    EditText et_pw;
+    EditText user_id;
+    EditText user_pw;
     Button send_login;
+    EditText http_url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        et_id = (EditText) findViewById(R.id.et_id);
-        et_pw = (EditText) findViewById(R.id.et_pw);
+        user_id = (EditText) findViewById(R.id.user_id);
+        user_pw = (EditText) findViewById(R.id.user_pw);
         send_login = (Button) findViewById(R.id.send_login);
+        http_url = (EditText) findViewById(R.id.http_url);
+
+
 
         send_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Log.d("login", "id : " + id + ", pw : " + pw);
-                new LoginTask(LoginActivity.this).execute("http://192.168.0.7:3000/api/login");
+                new LoginTask(LoginActivity.this).execute("http://" + http_url.getText() + "/api/login");
+                Log.d("http_url", "http://" + http_url.getText() + "/api/login");
             }
         });
     }
@@ -73,8 +80,8 @@ public class LoginActivity extends AppCompatActivity {
         protected String doInBackground(String... urls) {
             try {
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.accumulate("user_id", et_id.getText().toString().trim());
-                jsonObject.accumulate("user_pw", et_pw.getText().toString());
+                jsonObject.accumulate("user_id", user_id.getText().toString().trim());
+                jsonObject.accumulate("user_pw", user_pw.getText().toString());
 
                 HttpURLConnection con = null;
                 BufferedReader reader = null;
@@ -139,10 +146,21 @@ public class LoginActivity extends AppCompatActivity {
 
             progressDialog.dismiss();
 
-            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+            if (!result.equals("Login Fail")) {     // Success
+                Toast.makeText(getApplicationContext(), result + " : " + user_id.getText().toString(), Toast.LENGTH_SHORT).show();
 
-            if (!result.equals("Login Fail")) {
+                SaveSharedPreference.setUserName(getApplicationContext(), user_id.getText().toString());
+
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("login_result", true);
+                resultIntent.putExtra("session_id", user_id.getText().toString());
+
+                setResult(RESULT_OK, resultIntent);
+
+
                 finish();
+            } else {
+                Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
             }
 
         }
