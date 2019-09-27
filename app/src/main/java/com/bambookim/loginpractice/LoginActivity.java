@@ -31,8 +31,8 @@ public class LoginActivity extends AppCompatActivity {
 
     EditText user_id;
     EditText user_pw;
-    Button send_login;
     EditText http_url;
+    Button send_login;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,19 +41,15 @@ public class LoginActivity extends AppCompatActivity {
 
         user_id = (EditText) findViewById(R.id.user_id);
         user_pw = (EditText) findViewById(R.id.user_pw);
-        send_login = (Button) findViewById(R.id.send_login);
         http_url = (EditText) findViewById(R.id.http_url);
+        send_login = (Button) findViewById(R.id.send_login);
+    }
 
 
-
-        send_login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Log.d("login", "id : " + id + ", pw : " + pw);
-                new LoginTask(LoginActivity.this).execute("http://" + http_url.getText() + "/api/login");
-                Log.d("http_url", "http://" + http_url.getText() + "/api/login");
-            }
-        });
+    // 로그인 버튼을 눌렀을 때 리스너
+    public void onLoginClicked(View v) {
+        new LoginTask(LoginActivity.this).execute("http://" + http_url.getText() + "/api/login");
+        Log.d("http_url", "http://" + http_url.getText() + "/api/login");
     }
 
     public class LoginTask extends AsyncTask<String, String, String> {
@@ -151,12 +147,11 @@ public class LoginActivity extends AppCompatActivity {
 
                 SaveSharedPreference.setUserName(getApplicationContext(), user_id.getText().toString());
 
-                Intent resultIntent = new Intent();
+                Intent resultIntent = new Intent(LoginActivity.this, HomeActivity.class);
                 resultIntent.putExtra("login_result", true);
                 resultIntent.putExtra("session_id", user_id.getText().toString());
 
-                setResult(RESULT_OK, resultIntent);
-
+                startActivity(resultIntent);
 
                 finish();
             } else {

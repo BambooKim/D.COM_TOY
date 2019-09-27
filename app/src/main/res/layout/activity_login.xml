@@ -5,64 +5,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:layout_marginTop="100dp"
     tools:context=".LoginActivity">
 
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/user_id"
+        android:layout_width="270dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_gravity="center_horizontal"
+        android:ems="10"
+        android:hint="아이디"
+        android:inputType="textPersonName" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="아이디"/>
-
-        <EditText
-            android:id="@+id/user_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="아이디"
-            android:inputType="textPersonName"
-            android:text="rlaqjarn1008"
-            tools:layout_editor_absoluteX="143dp"
-            tools:layout_editor_absoluteY="280dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/user_pw"
+        android:layout_width="270dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="비밀번호"/>
-
-        <EditText
-            android:id="@+id/user_pw"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="비밀번호"
-            android:inputType="textPassword"
-            android:text="asdf"
-            tools:layout_editor_absoluteX="143dp"
-            tools:layout_editor_absoluteY="334dp" />
-    </LinearLayout>
+        android:layout_gravity="center_horizontal"
+        android:ems="10"
+        android:hint="비밀번호"
+        android:inputType="textPassword" />
 
     <EditText
         android:id="@+id/http_url"
-        android:layout_width="match_parent"
+        android:layout_width="270dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:ems="10"
         android:hint="Http URL"
-        android:text="172.16.220.34:3000" />
+        android:text="192.168.0.7:3000" />
 
     <Button
         android:id="@+id/send_login"
-        android:layout_width="match_parent"
+        android:layout_width="270dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:onClick="onLoginClicked"
         android:text="로그인" />
 
 </LinearLayout>

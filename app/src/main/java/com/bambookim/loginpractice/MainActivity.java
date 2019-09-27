@@ -2,107 +2,45 @@ package com.bambookim.loginpractice;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
-    Button btn_login, btn_sign, btn_logout;
-    TextView textView;
-
-    boolean logined;
-    String current_session;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btn_login = (Button) findViewById(R.id.btn_login);
-        btn_sign = (Button) findViewById(R.id.btn_sign);
-        btn_logout = (Button) findViewById(R.id.btn_logout);
-        textView = (TextView) findViewById(R.id.textView);
-
-        current_session = SaveSharedPreference.getUserName(getApplicationContext());
-        logined = !(current_session.equals(""));
-
-        if (logined) {
-            textView.setText(current_session);
-
-            btn_sign.setVisibility(View.GONE);
-            btn_login.setVisibility(View.GONE);
-        } else {
-            btn_logout.setVisibility(View.GONE);
-        }
-
-        btn_login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), FirstAuthActivity.class);
-
-                startActivity(intent);
-            }
-        });
-
-        btn_logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SaveSharedPreference.clearUserName(getApplicationContext());
-
-                btn_sign.setVisibility(View.VISIBLE);
-                btn_login.setVisibility(View.VISIBLE);
-                btn_logout.setVisibility(View.GONE);
-
-                textView.setText("");
-            }
-        });
+        Intent auth_check_intent = new Intent(getApplicationContext(), AuthorizationCheck.class);
+        startService(auth_check_intent);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        btn_login = (Button) findViewById(R.id.btn_login);
-        btn_sign = (Button) findViewById(R.id.btn_sign);
-        btn_logout = (Button) findViewById(R.id.btn_logout);
-        textView = (TextView) findViewById(R.id.textView);
-
-        current_session = SaveSharedPreference.getUserName(getApplicationContext());
-        logined = !(current_session.equals(""));
-
-        if (logined) {
-            textView.setText(current_session);
-
-            btn_sign.setVisibility(View.GONE);
-            btn_login.setVisibility(View.GONE);
-
-            btn_logout.setVisibility(View.VISIBLE);
-        } else {
-            btn_logout.setVisibility(View.GONE);
-        }
-
-        btn_login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), FirstAuthActivity.class);
-
-                startActivity(intent);
-            }
-        });
-
-        btn_logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SaveSharedPreference.clearUserName(getApplicationContext());
-
-                btn_sign.setVisibility(View.VISIBLE);
-                btn_login.setVisibility(View.VISIBLE);
-                btn_logout.setVisibility(View.GONE);
-
-                textView.setText("");
-            }
-        });
+        finish();
     }
 }
