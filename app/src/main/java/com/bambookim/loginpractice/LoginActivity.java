@@ -3,15 +3,22 @@ package com.bambookim.loginpractice;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import org.json.JSONObject;
@@ -29,27 +36,70 @@ import java.net.URL;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private static final String TAG = "LoginActivity";
+
+    ImageView logo;
     EditText user_id;
     EditText user_pw;
     EditText http_url;
     Button send_login;
+    Button login_signup;
+
+    LinearLayout layout;
+
+    boolean isKeyboardShowing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        logo = (ImageView) findViewById(R.id.loginLogo);
         user_id = (EditText) findViewById(R.id.user_id);
         user_pw = (EditText) findViewById(R.id.user_pw);
         http_url = (EditText) findViewById(R.id.http_url);
         send_login = (Button) findViewById(R.id.send_login);
-    }
+        login_signup = (Button) findViewById(R.id.login_signup);
 
+        layout = (LinearLayout) findViewById(R.id.login_layout);
+
+        layout.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        Rect r = new Rect();
+                        layout.getWindowVisibleDisplayFrame(r);
+                        int screenHeight = layout.getRootView().getHeight();
+
+                        int keypadHeight = screenHeight - r.bottom;
+
+                        Log.d(TAG, "keypadHeight = " + keypadHeight);
+
+                        if (keypadHeight > screenHeight * 0.15) {
+                            if (!isKeyboardShowing) {
+                                isKeyboardShowing = true;
+                                logo.setVisibility(View.GONE);
+                            }
+                        } else {
+                            if (isKeyboardShowing) {
+                                isKeyboardShowing = false;
+                                logo.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
+                }
+        );
+    }
 
     // 로그인 버튼을 눌렀을 때 리스너
     public void onLoginClicked(View v) {
         new LoginTask(LoginActivity.this).execute("http://" + http_url.getText() + "/api/login");
         Log.d("http_url", "http://" + http_url.getText() + "/api/login");
+    }
+
+    public void onLoginSignupClicked(View v) {
+        Intent loginToSignup = new Intent(getApplicationContext(), SignupActivity.class);
+        startActivity(loginToSignup);
     }
 
     public class LoginTask extends AsyncTask<String, String, String> {
