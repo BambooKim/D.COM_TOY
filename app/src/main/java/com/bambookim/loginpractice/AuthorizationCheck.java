@@ -30,7 +30,8 @@ public class AuthorizationCheck extends Service {
 
         processCommand(intent);
 
-        return super.onStartCommand(intent, flags, startId);
+        // return super.onStartCommand(intent, flags, startId);
+        return Service.START_NOT_STICKY;
     }
 
     public void processCommand(Intent intent) {

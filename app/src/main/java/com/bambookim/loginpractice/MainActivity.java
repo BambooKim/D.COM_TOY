@@ -33,9 +33,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         Intent auth_check_intent = new Intent(getApplicationContext(), AuthorizationCheck.class);
         startService(auth_check_intent);
     }
+
 
     @Override
     protected void onResume() {

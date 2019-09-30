@@ -42,3 +42,7 @@ proguard/
 *.ipr
 *.iws
 .idea/
+
+
+# Google Services API Key
+app/google-services.json
