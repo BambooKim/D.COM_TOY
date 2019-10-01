@@ -1,19 +1,20 @@
-package com.bambookim.loginpractice;
+package com.bambookim.dcom;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import org.json.JSONObject;
@@ -29,82 +30,86 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class SignupActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
-    private static final String TAG = "SignupActivity";
+    private static final String TAG = "LoginActivity";
 
-    EditText signup_name, signup_numId, signup_dept, signup_pw, signup_pwchk, signup_email, signup_http_url;
-    Button send_signup;
-    TextView pwchk_matches;
+    ImageView logo;
+    EditText user_id;
+    EditText user_pw;
+    EditText http_url;
+    Button send_login;
+    Button login_signup;
+
+    LinearLayout layout;
+
+    boolean isKeyboardShowing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_signup);
+        setContentView(R.layout.activity_login);
 
-        signup_name = (EditText) findViewById(R.id.signup_name);
-        signup_numId = (EditText) findViewById(R.id.signup_numId);
-        signup_dept = (EditText) findViewById(R.id.signup_dept);
-        signup_pw = (EditText) findViewById(R.id.signup_pw);
-        signup_pwchk = (EditText) findViewById(R.id.signup_pwchk);
-        signup_email = (EditText) findViewById(R.id.signup_email);
-        signup_http_url = (EditText) findViewById(R.id.signup_http_url);
-        send_signup = (Button) findViewById(R.id.send_signup);
-        pwchk_matches = (TextView) findViewById(R.id.pwchk_matches);
-        pwchk_matches.setVisibility(View.GONE);
+        logo = (ImageView) findViewById(R.id.loginLogo);
+        user_id = (EditText) findViewById(R.id.user_id);
+        user_pw = (EditText) findViewById(R.id.user_pw);
+        http_url = (EditText) findViewById(R.id.http_url);
+        send_login = (Button) findViewById(R.id.send_login);
+        login_signup = (Button) findViewById(R.id.login_signup);
 
-        signup_pwchk.addTextChangedListener(new TextWatcher() {
-            boolean matches;
+        layout = (LinearLayout) findViewById(R.id.login_layout);
 
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                pwchk_matches.setVisibility(View.GONE);
-            }
+        layout.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        Rect r = new Rect();
+                        layout.getWindowVisibleDisplayFrame(r);
+                        int screenHeight = layout.getRootView().getHeight();
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String password = signup_pw.getText().toString();
-                String passwordchk = s.toString();
+                        int keypadHeight = screenHeight - r.bottom;
 
-                matches = password.equals(passwordchk);
+                        Log.d(TAG, "keypadHeight = " + keypadHeight);
 
-                if (matches) {
-                    pwchk_matches.setVisibility(View.GONE);
-                } else {
-                    pwchk_matches.setVisibility(View.VISIBLE);
-                    pwchk_matches.setText("비밀번호가 일치하지 않습니다.");
+                        if (keypadHeight > screenHeight * 0.15) {
+                            if (!isKeyboardShowing) {
+                                isKeyboardShowing = true;
+                                logo.setVisibility(View.GONE);
+                            }
+                        } else {
+                            if (isKeyboardShowing) {
+                                isKeyboardShowing = false;
+                                logo.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
                 }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (matches) {
-                    pwchk_matches.setVisibility(View.GONE);
-                } else {
-                    pwchk_matches.setVisibility(View.VISIBLE);
-                    pwchk_matches.setText("비밀번호가 일치하지 않습니다.");
-                }
-            }
-        });
+        );
     }
 
-    public void onSendSignupBtnClicked(View v) {
-        new SignupTask(SignupActivity.this).execute("http://" + signup_http_url.getText() + "/api/signup");
-        Log.d(TAG, "onSendSignupBtnClicked() called");
+    // 로그인 버튼을 눌렀을 때 리스너
+    public void onLoginClicked(View v) {
+        new LoginTask(LoginActivity.this).execute("http://" + http_url.getText() + "/api/login");
+        Log.d("http_url", "http://" + http_url.getText() + "/api/login");
     }
 
-    public class SignupTask extends AsyncTask<String, String, String> {
+    public void onLoginSignupClicked(View v) {
+        Intent loginToSignup = new Intent(getApplicationContext(), SignupActivity.class);
+        startActivity(loginToSignup);
+    }
+
+    public class LoginTask extends AsyncTask<String, String, String> {
         ProgressDialog progressDialog;
         private Context mContext;
 
-        public SignupTask(Context context) {
+        public LoginTask(Context context) {
             mContext = context;
         }
 
         @Override
         protected void onPreExecute() {
             progressDialog = new ProgressDialog(mContext);
-            progressDialog.setMessage("회원가입 처리중...");
+            progressDialog.setMessage("로그인 정보 가져오는 중...");
             progressDialog.setCancelable(true);
             progressDialog.setProgressStyle(R.style.Widget_AppCompat_ProgressBar_Horizontal);
 
@@ -117,11 +122,9 @@ public class SignupActivity extends AppCompatActivity {
         protected String doInBackground(String... urls) {
             try {
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.accumulate("name", signup_name.getText().toString().trim());
-                jsonObject.accumulate("numId", signup_numId.getText().toString().trim());
-                jsonObject.accumulate("dept", signup_dept.getText().toString().trim());
-                jsonObject.accumulate("pw", signup_pw.getText().toString());
-                jsonObject.accumulate("email", signup_email.getText().toString());
+                jsonObject.accumulate("user_id", user_id.getText().toString().trim());
+                jsonObject.accumulate("user_pw", user_pw.getText().toString());
+                jsonObject.accumulate("token", SaveSharedPreference.getToken(getApplicationContext()));
 
                 HttpURLConnection con = null;
                 BufferedReader reader = null;
@@ -186,10 +189,14 @@ public class SignupActivity extends AppCompatActivity {
 
             progressDialog.dismiss();
 
-            if (result.equals("test")) {     // Success
-                Toast.makeText(getApplicationContext(), signup_name.getText().toString() + "님, 가입을 환영합니다.", Toast.LENGTH_SHORT).show();
+            if (!result.equals("Login Fail")) {     // Success
+                Toast.makeText(getApplicationContext(), result + " : " + user_id.getText().toString(), Toast.LENGTH_SHORT).show();
 
-                Intent resultIntent = new Intent(SignupActivity.this, LoginActivity.class);
+                SaveSharedPreference.setPreferences(1, getApplicationContext(), user_id.getText().toString());
+
+                Intent resultIntent = new Intent(LoginActivity.this, HomeActivity.class);
+                resultIntent.putExtra("login_result", true);
+                resultIntent.putExtra("session_id", user_id.getText().toString());
 
                 startActivity(resultIntent);
 
@@ -197,6 +204,7 @@ public class SignupActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
             }
+
         }
     }
 }

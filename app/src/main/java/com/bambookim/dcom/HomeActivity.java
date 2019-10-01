@@ -1,10 +1,9 @@
-package com.bambookim.loginpractice;
+package com.bambookim.dcom;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,7 +20,7 @@ public class HomeActivity extends AppCompatActivity {
     private final static String TAG = "HomeActivity";
 
     TextView textView;
-    Button logOut_btn;
+    Button logOut_btn, writePush;
 
     String sessionId;
 
@@ -32,6 +31,7 @@ public class HomeActivity extends AppCompatActivity {
 
         textView = (TextView) findViewById(R.id.sessionId);
         logOut_btn = (Button) findViewById(R.id.logOut);
+        writePush = (Button) findViewById(R.id.writePush);
 
         sessionId = SaveSharedPreference.getUserName(getApplicationContext());
         textView.setText(sessionId);
@@ -66,5 +66,10 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(gotoLogIn);
 
         finish();
+    }
+
+    public void onwritePushClicked(View v) {
+        Intent writePush = new Intent(this, SendPushActivity.class);
+        startActivity(writePush);
     }
 }

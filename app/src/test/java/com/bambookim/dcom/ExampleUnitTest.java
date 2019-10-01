@@ -1,4 +1,4 @@
-package com.bambookim.loginpractice;
+package com.bambookim.dcom;
 
 import org.junit.Test;
 

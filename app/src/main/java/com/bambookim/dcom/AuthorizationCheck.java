@@ -1,4 +1,4 @@
-package com.bambookim.loginpractice;
+package com.bambookim.dcom;
 
 import android.app.Service;
 import android.content.Intent;
