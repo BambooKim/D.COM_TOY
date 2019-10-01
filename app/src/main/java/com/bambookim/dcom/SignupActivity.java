@@ -5,14 +5,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,10 +35,12 @@ import java.net.URL;
 public class SignupActivity extends AppCompatActivity {
 
     private static final String TAG = "SignupActivity";
+    static boolean isKeyboardShowing = false;
 
     EditText signup_name, signup_numId, signup_dept, signup_pw, signup_pwchk, signup_email, signup_http_url;
     Button send_signup;
     TextView pwchk_matches;
+    LinearLayout layout, marginLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +57,8 @@ public class SignupActivity extends AppCompatActivity {
         send_signup = (Button) findViewById(R.id.send_signup);
         pwchk_matches = (TextView) findViewById(R.id.pwchk_matches);
         pwchk_matches.setVisibility(View.GONE);
+        layout = (LinearLayout) findViewById(R.id.signupLayout);
+        marginLayout = (LinearLayout) findViewById(R.id.marginLayout);
 
         signup_pwchk.addTextChangedListener(new TextWatcher() {
             boolean matches;
@@ -86,6 +93,33 @@ public class SignupActivity extends AppCompatActivity {
                 }
             }
         });
+
+        layout.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        Rect r = new Rect();
+                        layout.getWindowVisibleDisplayFrame(r);
+                        int screenHeight = layout.getRootView().getHeight();
+
+                        int keypadHeight = screenHeight - r.bottom;
+
+                        Log.d(TAG, "keypadHeight = " + keypadHeight);
+
+                        if (keypadHeight > screenHeight * 0.15) {
+                            if (!isKeyboardShowing) {
+                                isKeyboardShowing = true;
+                                marginLayout.setVisibility(View.GONE);
+                            }
+                        } else {
+                            if (isKeyboardShowing) {
+                                isKeyboardShowing = false;
+                                marginLayout.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
+                }
+        );
     }
 
     public void onSendSignupBtnClicked(View v) {

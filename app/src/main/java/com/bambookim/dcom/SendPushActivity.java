@@ -45,8 +45,15 @@ public class SendPushActivity extends AppCompatActivity {
     }
 
     public void onsendBtnClicked(View v) {
-        new PushTask(SendPushActivity.this).execute("http://" + http_url.getText() + "/api/sendPush");
-        Log.d("http_url", "http://" + http_url.getText() + "/api/sendPush");
+        boolean titleIsEmpty = (title.getText().toString().trim().length() == 0);
+        boolean bodyIsEmpty = (title.getText().toString().trim().length() == 0);
+
+        if (titleIsEmpty || bodyIsEmpty) {
+            Toast.makeText(getApplicationContext(), "제목 또는 내용을 입력해주세요.", Toast.LENGTH_SHORT).show();
+        } else {
+            new PushTask(SendPushActivity.this).execute("http://" + http_url.getText() + "/api/sendPush");
+            Log.d("http_url", "http://" + http_url.getText() + "/api/sendPush");
+        }
     }
 
     public class PushTask extends AsyncTask<String, String, String> {
@@ -61,7 +68,7 @@ public class SendPushActivity extends AppCompatActivity {
         protected void onPreExecute() {
             progressDialog = new ProgressDialog(mContext);
             progressDialog.setMessage("푸시 전송 처리 중...");
-            progressDialog.setCancelable(false);
+            progressDialog.setCancelable(true);
             progressDialog.setProgressStyle(R.style.Widget_AppCompat_ProgressBar_Horizontal);
 
             progressDialog.show();
@@ -75,6 +82,7 @@ public class SendPushActivity extends AppCompatActivity {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.accumulate("pushTitle", title.getText().toString());
                 jsonObject.accumulate("pushBody", body.getText().toString());
+                jsonObject.accumulate("senderToken", SaveSharedPreference.getToken(getApplicationContext()));
 
                 HttpURLConnection con = null;
                 BufferedReader reader = null;

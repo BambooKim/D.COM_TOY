@@ -34,6 +34,7 @@ import java.net.URL;
 public class FirebaseMessagingIDService extends FirebaseMessagingService {
 
     private final static String TAG = "FirebaseMessaging";
+    private static int noti_count = 0;
 
     @Override
     public void onNewToken(String s) {
@@ -68,7 +69,7 @@ public class FirebaseMessagingIDService extends FirebaseMessagingService {
             String channel_nm = "Push_Alarm"; // 앱 설정에서 알림 이름으로 뜸.
 
             NotificationManager notichannel = (android.app.NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            NotificationChannel channelMessage = new NotificationChannel(channel, channel_nm,                    android.app.NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channelMessage = new NotificationChannel(channel, channel_nm, NotificationManager.IMPORTANCE_HIGH);
             channelMessage.enableLights(true);
             channelMessage.enableVibration(true);
             channelMessage.setShowBadge(false);
@@ -89,9 +90,8 @@ public class FirebaseMessagingIDService extends FirebaseMessagingService {
             NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-            notificationManager.notify(9999, notificationBuilder.build());
-
-
+            notificationManager.notify(noti_count, notificationBuilder.build());
+            noti_count++;
         } else {
             NotificationCompat.Builder notificationBuilder =
                     new NotificationCompat.Builder(this, "")
@@ -107,8 +107,8 @@ public class FirebaseMessagingIDService extends FirebaseMessagingService {
             NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-            notificationManager.notify(9999, notificationBuilder.build());
-
+            notificationManager.notify(noti_count, notificationBuilder.build());
+            noti_count++;
         }
     }
 }
