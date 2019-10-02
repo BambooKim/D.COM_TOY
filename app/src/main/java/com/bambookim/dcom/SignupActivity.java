@@ -1,6 +1,8 @@
 package com.bambookim.dcom;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -13,6 +15,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -35,97 +38,157 @@ import java.net.URL;
 public class SignupActivity extends AppCompatActivity {
 
     private static final String TAG = "SignupActivity";
-    static boolean isKeyboardShowing = false;
 
-    EditText signup_name, signup_numId, signup_dept, signup_pw, signup_pwchk, signup_email, signup_http_url;
-    Button send_signup;
-    TextView pwchk_matches;
-    LinearLayout layout, marginLayout;
+    protected static int next_clicked = 0;
+    protected static boolean isEndFragment = false;
+
+    protected String name, numId, dept, userId, pw, email;
+
+    EditText signup_name, signup_numId, signup_userid, signup_dept, signup_email, signup_http_url,
+            signup_pw, signup_pwchk;
+    Button send_signup, signup_next;
+    LinearLayout layout;
+
+    /**
+     * Fragment Class In SignupActivity
+     */
+    SignupName nameFragment = new SignupName();
+    SignupSchoolInfo schoolInfoFragment = new SignupSchoolInfo();
+    SignupUserInfo userInfoFragment = new SignupUserInfo();
+    SignupPassword passwordFragment = new SignupPassword();
+    SignupEmail emailFragment = new SignupEmail();
+
+    FragmentManager fragmentManager = getSupportFragmentManager();
+    FragmentTransaction transaction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        signup_name = (EditText) findViewById(R.id.signup_name);
-        signup_numId = (EditText) findViewById(R.id.signup_numId);
-        signup_dept = (EditText) findViewById(R.id.signup_dept);
-        signup_pw = (EditText) findViewById(R.id.signup_pw);
-        signup_pwchk = (EditText) findViewById(R.id.signup_pwchk);
-        signup_email = (EditText) findViewById(R.id.signup_email);
-        signup_http_url = (EditText) findViewById(R.id.signup_http_url);
         send_signup = (Button) findViewById(R.id.send_signup);
-        pwchk_matches = (TextView) findViewById(R.id.pwchk_matches);
-        pwchk_matches.setVisibility(View.GONE);
-        layout = (LinearLayout) findViewById(R.id.signupLayout);
-        marginLayout = (LinearLayout) findViewById(R.id.marginLayout);
+        signup_next = (Button) findViewById(R.id.signup_next);
 
-        signup_pwchk.addTextChangedListener(new TextWatcher() {
-            boolean matches;
+        send_signup.setVisibility(View.GONE);
 
+        transaction = fragmentManager.beginTransaction();
+        transaction
+                .replace(R.id.signup_frame, nameFragment)
+                .commit();
+        signup_name = (EditText) findViewById(R.id.signup_name);
+
+        InputMethodManager inputMethodManager
+                = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager
+                .toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+
+        signup_next.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                pwchk_matches.setVisibility(View.GONE);
-            }
+            public void onClick(View v) {
+                switch (next_clicked) {
+                    case 0:
+                        signup_name = (EditText) findViewById(R.id.signup_name);
+                        name = signup_name.getText().toString().trim();
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String password = signup_pw.getText().toString();
-                String passwordchk = s.toString();
+                        transaction = fragmentManager.beginTransaction();
+                        transaction
+                                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
+                                        R.anim.enter_from_right, R.anim.exit_to_left)
+                                .replace(R.id.signup_frame, schoolInfoFragment)
+                                .addToBackStack(null)
+                                .commit();
 
-                matches = password.equals(passwordchk);
+                        next_clicked++;
+                        break;
+                    case 1:
+                        signup_numId = (EditText) findViewById(R.id.signup_numId);
+                        signup_dept = (EditText) findViewById(R.id.signup_dept);
 
-                if (matches) {
-                    pwchk_matches.setVisibility(View.GONE);
-                } else {
-                    pwchk_matches.setVisibility(View.VISIBLE);
-                    pwchk_matches.setText("비밀번호가 일치하지 않습니다.");
-                }
-            }
+                        numId = signup_numId.getText().toString().trim();
+                        dept = signup_dept.getText().toString().trim();
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (matches) {
-                    pwchk_matches.setVisibility(View.GONE);
-                } else {
-                    pwchk_matches.setVisibility(View.VISIBLE);
-                    pwchk_matches.setText("비밀번호가 일치하지 않습니다.");
+                        transaction = fragmentManager.beginTransaction();
+                        transaction
+                                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
+                                        R.anim.enter_from_right, R.anim.exit_to_left)
+                                .replace(R.id.signup_frame, userInfoFragment)
+                                .addToBackStack(null)
+                                .commit();
+
+                        next_clicked++;
+                        break;
+                    case 2:
+                        signup_userid = (EditText) findViewById(R.id.signup_userid);
+                        userId = signup_userid.getText().toString().trim();
+
+                        transaction = fragmentManager.beginTransaction();
+                        transaction
+                                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
+                                        R.anim.enter_from_right, R.anim.exit_to_left)
+                                .replace(R.id.signup_frame, passwordFragment)
+                                .addToBackStack(null)
+                                .commit();
+
+                        next_clicked++;
+
+                        break;
+                    case 3:
+                        signup_pw = (EditText) findViewById(R.id.signup_pw);
+                        pw = signup_pw.getText().toString();
+
+                        send_signup.setVisibility(View.VISIBLE);
+                        signup_next.setVisibility(View.GONE);
+
+                        transaction = fragmentManager.beginTransaction();
+                        transaction
+                                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
+                                        R.anim.enter_from_right, R.anim.exit_to_left)
+                                .replace(R.id.signup_frame, emailFragment)
+                                .addToBackStack(null)
+                                .commit();
+
+                        isEndFragment = true;
+                        next_clicked++;
+                        break;
                 }
             }
         });
-
-        layout.getViewTreeObserver().addOnGlobalLayoutListener(
-                new ViewTreeObserver.OnGlobalLayoutListener() {
-                    @Override
-                    public void onGlobalLayout() {
-                        Rect r = new Rect();
-                        layout.getWindowVisibleDisplayFrame(r);
-                        int screenHeight = layout.getRootView().getHeight();
-
-                        int keypadHeight = screenHeight - r.bottom;
-
-                        Log.d(TAG, "keypadHeight = " + keypadHeight);
-
-                        if (keypadHeight > screenHeight * 0.15) {
-                            if (!isKeyboardShowing) {
-                                isKeyboardShowing = true;
-                                marginLayout.setVisibility(View.GONE);
-                            }
-                        } else {
-                            if (isKeyboardShowing) {
-                                isKeyboardShowing = false;
-                                marginLayout.setVisibility(View.VISIBLE);
-                            }
-                        }
-                    }
-                }
-        );
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        next_clicked = 0;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        if (next_clicked != 0) {
+            next_clicked--;
+        }
+
+        if (next_clicked == 3) {
+            send_signup.setVisibility(View.GONE);
+            signup_next.setVisibility(View.VISIBLE);
+        }
+    }
+
+
 
     public void onSendSignupBtnClicked(View v) {
-        new SignupTask(SignupActivity.this).execute("http://" + signup_http_url.getText() + "/api/signup");
+        signup_email = (EditText) findViewById(R.id.signup_email);
+        signup_http_url = (EditText) findViewById(R.id.signup_http_url);
+
+        email = signup_email.getText().toString().trim();
+
+        new SignupTask(SignupActivity.this)
+                .execute("http://" + signup_http_url.getText() + "/api/signup");
         Log.d(TAG, "onSendSignupBtnClicked() called");
     }
+
 
     public class SignupTask extends AsyncTask<String, String, String> {
         ProgressDialog progressDialog;
@@ -151,11 +214,12 @@ public class SignupActivity extends AppCompatActivity {
         protected String doInBackground(String... urls) {
             try {
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.accumulate("name", signup_name.getText().toString().trim());
-                jsonObject.accumulate("numId", signup_numId.getText().toString().trim());
-                jsonObject.accumulate("dept", signup_dept.getText().toString().trim());
-                jsonObject.accumulate("pw", signup_pw.getText().toString());
-                jsonObject.accumulate("email", signup_email.getText().toString());
+                jsonObject.accumulate("name", name);
+                jsonObject.accumulate("numId", numId);
+                jsonObject.accumulate("dept", dept);
+                jsonObject.accumulate("userId", userId);
+                jsonObject.accumulate("pw", pw);
+                jsonObject.accumulate("email", email);
 
                 HttpURLConnection con = null;
                 BufferedReader reader = null;
@@ -220,10 +284,12 @@ public class SignupActivity extends AppCompatActivity {
 
             progressDialog.dismiss();
 
-            if (result.equals("test")) {     // Success
-                Toast.makeText(getApplicationContext(), signup_name.getText().toString() + "님, 가입을 환영합니다.", Toast.LENGTH_SHORT).show();
+            if (result.equals("Success")) {
+                Toast.makeText(getApplicationContext(), signup_name.getText().toString()
+                        + "님, 가입을 환영합니다.", Toast.LENGTH_SHORT).show();
 
-                Intent resultIntent = new Intent(SignupActivity.this, LoginActivity.class);
+                Intent resultIntent
+                        = new Intent(SignupActivity.this, LoginActivity.class);
 
                 startActivity(resultIntent);
 
