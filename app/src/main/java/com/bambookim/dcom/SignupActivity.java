@@ -4,8 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.AsyncTask;
@@ -34,6 +36,8 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -42,7 +46,7 @@ public class SignupActivity extends AppCompatActivity {
     protected static int next_clicked = 0;
     protected static boolean isEndFragment = false;
 
-    protected String name, numId, dept, userId, pw, email;
+    protected String name, numId, dept, userId, pw, pwchk, email;
 
     EditText signup_name, signup_numId, signup_userid, signup_dept, signup_email, signup_http_url,
             signup_pw, signup_pwchk;
@@ -90,15 +94,21 @@ public class SignupActivity extends AppCompatActivity {
                         signup_name = (EditText) findViewById(R.id.signup_name);
                         name = signup_name.getText().toString().trim();
 
-                        transaction = fragmentManager.beginTransaction();
-                        transaction
-                                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
-                                        R.anim.enter_from_right, R.anim.exit_to_left)
-                                .replace(R.id.signup_frame, schoolInfoFragment)
-                                .addToBackStack(null)
-                                .commit();
+                        if (name.equals("")) {
+                            showDialogMessage("이름을 입력해 주세요.");
+                        } else if (Pattern.matches("[!@#$%^&*(),.?\":{}|<>]", name)) {
+                            showDialogMessage("올바르지 않은 이름입니다.");
+                        } else {
+                            transaction = fragmentManager.beginTransaction();
+                            transaction
+                                    .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
+                                            R.anim.enter_from_right, R.anim.exit_to_left)
+                                    .replace(R.id.signup_frame, schoolInfoFragment)
+                                    .addToBackStack(null)
+                                    .commit();
 
-                        next_clicked++;
+                            next_clicked++;
+                        }
                         break;
                     case 1:
                         signup_numId = (EditText) findViewById(R.id.signup_numId);
@@ -107,52 +117,112 @@ public class SignupActivity extends AppCompatActivity {
                         numId = signup_numId.getText().toString().trim();
                         dept = signup_dept.getText().toString().trim();
 
-                        transaction = fragmentManager.beginTransaction();
-                        transaction
-                                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
-                                        R.anim.enter_from_right, R.anim.exit_to_left)
-                                .replace(R.id.signup_frame, userInfoFragment)
-                                .addToBackStack(null)
-                                .commit();
+                        if (numId.equals("")) {
+                            showDialogMessage("학번을 입력해 주세요.");
+                        } else if (numId.length() != 10 || !Pattern.matches("^[0-9]+$", numId)) {
+                            showDialogMessage("올바르지 않은 학번입니다.");
+                        } else if (dept.equals("")) {
+                            showDialogMessage("학과를 선택해 주세요.");
+                        } else {
+                            transaction = fragmentManager.beginTransaction();
+                            transaction
+                                    .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
+                                            R.anim.enter_from_right, R.anim.exit_to_left)
+                                    .replace(R.id.signup_frame, userInfoFragment)
+                                    .addToBackStack(null)
+                                    .commit();
 
-                        next_clicked++;
+                            next_clicked++;
+                        }
                         break;
                     case 2:
                         signup_userid = (EditText) findViewById(R.id.signup_userid);
                         userId = signup_userid.getText().toString().trim();
 
-                        transaction = fragmentManager.beginTransaction();
-                        transaction
-                                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
-                                        R.anim.enter_from_right, R.anim.exit_to_left)
-                                .replace(R.id.signup_frame, passwordFragment)
-                                .addToBackStack(null)
-                                .commit();
+                        if (userId.equals("")) {
+                            showDialogMessage("아이디를 입력해 주세요.");
+                        } else if (!Pattern.matches("^[a-zA-Z]{1}[a-zA-Z0-9_]{5,15}$", userId)) {
+                            showDialogMessage("올바르지 않은 아이디입니다.\n" +
+                                    "아이디는 영문과 숫자로만 이루어진\n" +
+                                    "5 ~ 15자로 이루어집니다.");
+                        } else {
+                            transaction = fragmentManager.beginTransaction();
+                            transaction
+                                    .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
+                                            R.anim.enter_from_right, R.anim.exit_to_left)
+                                    .replace(R.id.signup_frame, passwordFragment)
+                                    .addToBackStack(null)
+                                    .commit();
 
-                        next_clicked++;
-
+                            next_clicked++;
+                        }
                         break;
                     case 3:
                         signup_pw = (EditText) findViewById(R.id.signup_pw);
-                        pw = signup_pw.getText().toString();
+                        signup_pwchk = (EditText) findViewById(R.id.signup_pwchk);
+                        pw = signup_pw.getText().toString().trim();
+                        pwchk = signup_pwchk.getText().toString().trim();
 
-                        send_signup.setVisibility(View.VISIBLE);
-                        signup_next.setVisibility(View.GONE);
+                        Pattern p = Pattern.compile("^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[!@#$%^&*?,./\\\\<>|_-[+]=\\`~\\(\\)\\[\\]\\{\\}])[A-Za-z[0-9]!@#$%^&*?,./\\\\<>|_-[+]=\\`~\\(\\)\\[\\]\\{\\}]{8,20}$");
+                        Matcher m = p.matcher(pw);
 
-                        transaction = fragmentManager.beginTransaction();
-                        transaction
-                                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
-                                        R.anim.enter_from_right, R.anim.exit_to_left)
-                                .replace(R.id.signup_frame, emailFragment)
-                                .addToBackStack(null)
-                                .commit();
+                        if (pw.equals("")) {
+                            showDialogMessage("비밀번호를 입력해 주세요.");
+                        } else if (!pw.equals(pwchk)) {
+                            showDialogMessage("비밀번호를 확인해 주세요.");
+                        } else if (!m.matches()) {
+                            showDialogMessage("올바르지 않은 비밀번호입니다.\n" +
+                                    "비밀번호는 특수문자가 포함된\n" +
+                                    "8 ~ 20자로 이루어집니다.");
+                        } else {
+                            send_signup.setVisibility(View.VISIBLE);
+                            signup_next.setVisibility(View.GONE);
 
-                        isEndFragment = true;
-                        next_clicked++;
+                            transaction = fragmentManager.beginTransaction();
+                            transaction
+                                    .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
+                                            R.anim.enter_from_right, R.anim.exit_to_left)
+                                    .replace(R.id.signup_frame, emailFragment)
+                                    .addToBackStack(null)
+                                    .commit();
+
+                            isEndFragment = true;
+                            next_clicked++;
+                        }
                         break;
                 }
             }
         });
+    }
+
+    public void onSendSignupBtnClicked(View v) {
+        signup_email = (EditText) findViewById(R.id.signup_email);
+        signup_http_url = (EditText) findViewById(R.id.signup_http_url);
+
+        email = signup_email.getText().toString().trim();
+
+        if (email.equals("")) {
+            showDialogMessage("이메일을 입력해 주세요.");
+        } else if (!Pattern.matches("^[_a-zA-Z0-9-\\.]+@[\\.a-zA-Z0-9-]+\\.[a-zA-Z]+$", email)) {
+            showDialogMessage("올바르지 않은 이메일입니다.");
+        } else {
+            new SignupTask(SignupActivity.this)
+                    .execute("http://" + signup_http_url.getText() + "/api/signup");
+            Log.d(TAG, "onSendSignupBtnClicked() called");
+        }
+    }
+
+    public void showDialogMessage(String message) {
+        new AlertDialog.Builder(SignupActivity.this)
+                .setTitle("안내").setMessage(message)
+                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .setCancelable(false)
+                .show();
     }
 
     @Override
@@ -175,20 +245,6 @@ public class SignupActivity extends AppCompatActivity {
             signup_next.setVisibility(View.VISIBLE);
         }
     }
-
-
-
-    public void onSendSignupBtnClicked(View v) {
-        signup_email = (EditText) findViewById(R.id.signup_email);
-        signup_http_url = (EditText) findViewById(R.id.signup_http_url);
-
-        email = signup_email.getText().toString().trim();
-
-        new SignupTask(SignupActivity.this)
-                .execute("http://" + signup_http_url.getText() + "/api/signup");
-        Log.d(TAG, "onSendSignupBtnClicked() called");
-    }
-
 
     public class SignupTask extends AsyncTask<String, String, String> {
         ProgressDialog progressDialog;
