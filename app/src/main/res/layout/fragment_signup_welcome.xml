@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SignupWelcome">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="30dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/welcome1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="경희대학교 컴퓨터공학과 학술동아리\nD.Com 회원가입을 환영합니다."
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:layout_marginBottom="15dp"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/welcome2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="회원가입은 아래의 순서에 따라 진행됩니다."
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:layout_marginBottom="15dp"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/welcome3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1. Info21 재학생 인증\n입력하신 아이디와 비밀번호는\n성명과 학번, 소속 학과만을 확인하는 데 사용되며,\n절대 서버에 저장되지 않습니다."
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:layout_marginBottom="10dp"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/welcome4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2. 아이디 설정"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:layout_marginBottom="10dp"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/welcome5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3. 비밀번호 설정"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:layout_marginBottom="10dp"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/welcome6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="4. 이메일 설정"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:layout_marginBottom="25dp"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/welcome7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="'다음'버튼을 클릭해 회원가입을 진행해 주세요."
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@android:color/black" />
+    </LinearLayout>
+
+
+</FrameLayout>

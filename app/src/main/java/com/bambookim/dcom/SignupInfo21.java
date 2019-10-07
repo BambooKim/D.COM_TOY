@@ -8,17 +8,15 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SignupName extends Fragment {
+public class SignupInfo21 extends Fragment {
 
 
-    public SignupName() {
+    public SignupInfo21() {
         // Required empty public constructor
     }
 
@@ -26,9 +24,8 @@ public class SignupName extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragmen
-
-        return inflater.inflate(R.layout.fragment_signup_name, container, false);
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_signup_info21, container, false);
     }
 
 }

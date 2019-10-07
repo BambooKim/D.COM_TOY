@@ -2,8 +2,10 @@ package com.bambookim.dcom;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.AsyncTask;
@@ -89,13 +91,32 @@ public class LoginActivity extends AppCompatActivity {
 
     // 로그인 버튼을 눌렀을 때 리스너
     public void onLoginClicked(View v) {
-        new LoginTask(LoginActivity.this).execute("http://" + http_url.getText() + "/api/login");
-        Log.d("http_url", "http://" + http_url.getText() + "/api/login");
+        if (user_id.getText().toString().trim().equals("")) {
+            showDialogMessage("아이디를 입력해 주세요.");
+        } else if (user_pw.getText().toString().trim().equals("")) {
+            showDialogMessage("비밀번호를 입력해 주세요.");
+        } else {
+            new LoginTask(LoginActivity.this).execute("http://" + http_url.getText() + "/api/login");
+            Log.d("http_url", "http://" + http_url.getText() + "/api/login");
+        }
     }
 
     public void onLoginSignupClicked(View v) {
         Intent loginToSignup = new Intent(getApplicationContext(), SignupActivity.class);
         startActivity(loginToSignup);
+    }
+
+    public void showDialogMessage(String message) {
+        new AlertDialog.Builder(LoginActivity.this)
+                .setTitle("안내").setMessage(message)
+                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .setCancelable(false)
+                .show();
     }
 
     public class LoginTask extends AsyncTask<String, String, String> {
@@ -110,7 +131,7 @@ public class LoginActivity extends AppCompatActivity {
         protected void onPreExecute() {
             progressDialog = new ProgressDialog(mContext);
             progressDialog.setMessage("로그인 정보 가져오는 중...");
-            progressDialog.setCancelable(true);
+            progressDialog.setCancelable(false);
             progressDialog.setProgressStyle(R.style.Widget_AppCompat_ProgressBar_Horizontal);
 
             progressDialog.show();

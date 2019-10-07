@@ -9,19 +9,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONObject;
@@ -46,18 +41,18 @@ public class SignupActivity extends AppCompatActivity {
     protected static int next_clicked = 0;
     protected static boolean isEndFragment = false;
 
-    protected String name, numId, dept, userId, pw, pwchk, email;
+    protected String info_id, info_pw, name, numId, dept, userId, pw, pwchk, email;
 
-    EditText signup_name, signup_numId, signup_userid, signup_dept, signup_email, signup_http_url,
-            signup_pw, signup_pwchk;
+    EditText signup_info_id, signup_info_pw, signup_userid, signup_email,
+            signup_http_url, signup_pw, signup_pwchk;
     Button send_signup, signup_next;
     LinearLayout layout;
 
     /**
      * Fragment Class In SignupActivity
      */
-    SignupName nameFragment = new SignupName();
-    SignupSchoolInfo schoolInfoFragment = new SignupSchoolInfo();
+    SignupWelcome welComeFragment = new SignupWelcome();
+    SignupInfo21 info21Fragment = new SignupInfo21();
     SignupUserInfo userInfoFragment = new SignupUserInfo();
     SignupPassword passwordFragment = new SignupPassword();
     SignupEmail emailFragment = new SignupEmail();
@@ -77,63 +72,52 @@ public class SignupActivity extends AppCompatActivity {
 
         transaction = fragmentManager.beginTransaction();
         transaction
-                .replace(R.id.signup_frame, nameFragment)
+                .replace(R.id.signup_frame, welComeFragment)
                 .commit();
-        signup_name = (EditText) findViewById(R.id.signup_name);
 
-        InputMethodManager inputMethodManager
-                = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager
-                .toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        // signup_info_id = (EditText) findViewById(R.id.signup_info_id);
+        // signup_info_pw = (EditText) findViewById(R.id.signup_info_pw);
+
+
 
         signup_next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switch (next_clicked) {
                     case 0:
-                        signup_name = (EditText) findViewById(R.id.signup_name);
-                        name = signup_name.getText().toString().trim();
+                        InputMethodManager inputMethodManager
+                                = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        inputMethodManager
+                                .toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
-                        if (name.equals("")) {
-                            showDialogMessage("이름을 입력해 주세요.");
-                        } else if (Pattern.matches("[!@#$%^&*(),.?\":{}|<>]", name)) {
-                            showDialogMessage("올바르지 않은 이름입니다.");
-                        } else {
-                            transaction = fragmentManager.beginTransaction();
-                            transaction
-                                    .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
-                                            R.anim.enter_from_right, R.anim.exit_to_left)
-                                    .replace(R.id.signup_frame, schoolInfoFragment)
-                                    .addToBackStack(null)
-                                    .commit();
+                        transaction = fragmentManager.beginTransaction();
+                        transaction
+                                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
+                                        R.anim.enter_from_right, R.anim.exit_to_left)
+                                .replace(R.id.signup_frame, info21Fragment)
+                                .addToBackStack(null)
+                                .commit();
 
-                            next_clicked++;
-                        }
+                        next_clicked++;
+
                         break;
                     case 1:
-                        signup_numId = (EditText) findViewById(R.id.signup_numId);
-                        signup_dept = (EditText) findViewById(R.id.signup_dept);
+                        signup_info_id = (EditText) findViewById(R.id.signup_info_id);
+                        signup_info_pw = (EditText) findViewById(R.id.signup_info_pw);
 
-                        numId = signup_numId.getText().toString().trim();
-                        dept = signup_dept.getText().toString().trim();
+                        info_id = signup_info_id.getText().toString().trim();
+                        info_pw = signup_info_pw.getText().toString().trim();
 
-                        if (numId.equals("")) {
-                            showDialogMessage("학번을 입력해 주세요.");
-                        } else if (numId.length() != 10 || !Pattern.matches("^[0-9]+$", numId)) {
-                            showDialogMessage("올바르지 않은 학번입니다.");
-                        } else if (dept.equals("")) {
-                            showDialogMessage("학과를 선택해 주세요.");
+                        if (info_id.equals("")) {
+                            showDialogMessage("인포21 아이디를 입력해 주세요.");
+                        } else if (info_pw.equals("")) {
+                            showDialogMessage("인포21 비밀번호를 입력해 주세요.");
                         } else {
-                            transaction = fragmentManager.beginTransaction();
-                            transaction
-                                    .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
-                                            R.anim.enter_from_right, R.anim.exit_to_left)
-                                    .replace(R.id.signup_frame, userInfoFragment)
-                                    .addToBackStack(null)
-                                    .commit();
 
-                            next_clicked++;
+                            new Info21Task(SignupActivity.this)
+                                    .execute("http://192.168.0.7:3000/api/info21");
                         }
+
                         break;
                     case 2:
                         signup_userid = (EditText) findViewById(R.id.signup_userid);
@@ -206,6 +190,8 @@ public class SignupActivity extends AppCompatActivity {
         } else if (!Pattern.matches("^[_a-zA-Z0-9-\\.]+@[\\.a-zA-Z0-9-]+\\.[a-zA-Z]+$", email)) {
             showDialogMessage("올바르지 않은 이메일입니다.");
         } else {
+
+
             new SignupTask(SignupActivity.this)
                     .execute("http://" + signup_http_url.getText() + "/api/signup");
             Log.d(TAG, "onSendSignupBtnClicked() called");
@@ -341,8 +327,13 @@ public class SignupActivity extends AppCompatActivity {
             progressDialog.dismiss();
 
             if (result.equals("Success")) {
-                Toast.makeText(getApplicationContext(), signup_name.getText().toString()
-                        + "님, 가입을 환영합니다.", Toast.LENGTH_SHORT).show();
+                InputMethodManager inputMethodManager
+                        = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager
+                        .toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+
+                Toast.makeText(SignupActivity.this, name + "님, 가입을 환영합니다.",
+                        Toast.LENGTH_SHORT).show();
 
                 Intent resultIntent
                         = new Intent(SignupActivity.this, LoginActivity.class);
@@ -351,7 +342,130 @@ public class SignupActivity extends AppCompatActivity {
 
                 finish();
             } else {
-                Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+                Toast.makeText(SignupActivity.this, result, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    public class Info21Task extends AsyncTask<String, String, String> {
+        ProgressDialog progressDialog;
+        private Context mContext;
+
+        public Info21Task(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog = new ProgressDialog(mContext);
+            progressDialog.setMessage("Info21 재학생 인증 처리중...");
+            progressDialog.setCancelable(false);
+            progressDialog.setProgressStyle(R.style.Widget_AppCompat_ProgressBar_Horizontal);
+
+            progressDialog.show();
+
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... urls) {
+            try {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.accumulate("info_id", info_id);
+                jsonObject.accumulate("info_pw", info_pw);
+
+                HttpURLConnection con = null;
+                BufferedReader reader = null;
+
+                try{
+                    //URL url = new URL("http://192.168.25.16:3000/users");
+                    URL url = new URL(urls[0]);
+                    con = (HttpURLConnection) url.openConnection();
+                    con.setRequestMethod("POST");
+                    con.setRequestProperty("Cache-Control", "no-cache");
+                    con.setRequestProperty("Content-Type", "application/json");
+                    con.setRequestProperty("Accept", "text/html");
+                    con.setDoOutput(true);
+                    con.setDoInput(true);
+                    con.connect();
+
+                    OutputStream outStream = con.getOutputStream();
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outStream));
+                    writer.write(jsonObject.toString());
+                    writer.flush();
+                    writer.close();
+
+                    InputStream stream = con.getInputStream();
+
+                    reader = new BufferedReader(new InputStreamReader(stream));
+
+                    StringBuffer buffer = new StringBuffer();
+
+                    String line = "";
+                    while((line = reader.readLine()) != null){
+                        buffer.append(line);
+                    }
+
+                    return buffer.toString();
+
+                } catch (MalformedURLException e){
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    if(con != null){
+                        con.disconnect();
+                    }
+                    try {
+                        if(reader != null){
+                            reader.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            progressDialog.dismiss();
+
+            if (result.equals("fail")) {
+                showDialogMessage("재학생 인증 실패...\n다시 시도해 주십시오.");
+            } else {
+                String[] array = result.split(", ");
+                name = array[0];
+                numId = array[1];
+                dept = array[2];
+
+                new AlertDialog.Builder(SignupActivity.this)
+                        .setTitle("본인인증 성공")
+                        .setMessage("이름 : " + name + "\n" +
+                                "학번 : " + numId + "\n" +
+                                "학과 : " + dept)
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                transaction = fragmentManager.beginTransaction();
+                                transaction
+                                        .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left,
+                                                R.anim.enter_from_right, R.anim.exit_to_left)
+                                        .replace(R.id.signup_frame, userInfoFragment)
+                                        .addToBackStack(null)
+                                        .commit();
+
+                                next_clicked++;
+                            }
+                        })
+                        .setCancelable(false)
+                        .show();
             }
         }
     }

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SignupName">
+    tools:context=".SignupInfo21">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,18 +11,25 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
         <EditText
-            android:id="@+id/signup_name"
+            android:id="@+id/signup_info_id"
             android:layout_width="270dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:ems="10"
-            android:hint="이름"
+            android:hint="Info21 아이디"
             android:inputType="textPersonName">
-        <requestFocus />
+            <requestFocus />
+        </EditText>
+        <EditText
+            android:id="@+id/signup_info_pw"
+            android:layout_width="270dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:ems="10"
+            android:hint="Info21 비밀번호"
+            android:inputType="textPassword">
         </EditText>
 
-
     </LinearLayout>
-
 
 </FrameLayout>
